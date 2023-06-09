@@ -2,11 +2,21 @@ import { Point } from "geojson";
 
 export default class GeoPoint implements Point {
   type: "Point";
-  coordinates: number[];
 
-  constructor(coordinates: number[]) {
+  x: number;
+  y: number;
+  z: number;
+
+  constructor(x: number, y: number, z = 0) {
     this.type = "Point";
-    this.coordinates = coordinates;
+
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  get coordinates(): number[] {
+    return [this.x, this.y, this.z];
   }
 
   distOther(other: GeoPoint): number {

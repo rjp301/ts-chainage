@@ -1,8 +1,53 @@
-import QuadRect from "./QuadRect";
-import GeoPoint from "../geometry/GeoPoint";
+import GeoPoint from "./geometry/GeoPoint";
 
-export default class QuadTree {
-  boundary: QuadRect;
+export class Rect {
+  cx: number;
+  cy: number;
+  w: number;
+  h: number;
+
+  west_edge: number;
+  east_edge: number;
+  north_edge: number;
+  south_edge: number;
+
+  constructor(cx: number, cy: number, w: number, h: number) {
+    this.cx = cx;
+    this.cy = cy;
+    this.w = w;
+    this.h = h;
+
+    this.west_edge = cx - w / 2;
+    this.east_edge = cx + w / 2;
+    this.north_edge = cy + h / 2;
+    this.south_edge = cy - h / 2;
+  }
+
+  toString() {
+    return `${this.west_edge} ${this.north_edge} ${this.east_edge} ${this.south_edge}`;
+  }
+
+  contains(point: GeoPoint): boolean {
+    return (
+      point.x >= this.west_edge &&
+      point.x < this.east_edge &&
+      point.y >= this.south_edge &&
+      point.y < this.north_edge
+    );
+  }
+
+  intersects(other: Rect): boolean {
+    return (
+      other.west_edge > this.east_edge ||
+      other.east_edge < this.west_edge ||
+      other.north_edge < this.south_edge ||
+      other.south_edge > this.north_edge
+    );
+  }
+}
+
+export class QuadTree {
+  boundary: Rect;
   capacity: number;
   depth: number;
   points: GeoPoint[];
@@ -13,7 +58,7 @@ export default class QuadTree {
   sw?: QuadTree;
   se?: QuadTree;
 
-  constructor(boundary: QuadRect, capacity = 4, depth = 0) {
+  constructor(boundary: Rect, capacity = 4, depth = 0) {
     this.boundary = boundary;
     this.capacity = capacity;
     this.depth = depth;
@@ -28,10 +73,10 @@ export default class QuadTree {
     const w = this.boundary.w / 2;
     const h = this.boundary.h / 2;
 
-    const nw = new QuadRect(cx - w / 2, cy + h / 2, w, h);
-    const ne = new QuadRect(cx + w / 2, cy + h / 2, w, h);
-    const sw = new QuadRect(cx - w / 2, cy - h / 2, w, h);
-    const se = new QuadRect(cx + w / 2, cy - h / 2, w, h);
+    const nw = new Rect(cx - w / 2, cy + h / 2, w, h);
+    const ne = new Rect(cx + w / 2, cy + h / 2, w, h);
+    const sw = new Rect(cx - w / 2, cy - h / 2, w, h);
+    const se = new Rect(cx + w / 2, cy - h / 2, w, h);
 
     this.nw = new QuadTree(nw, this.capacity, this.depth + 1);
     this.ne = new QuadTree(ne, this.capacity, this.depth + 1);
@@ -56,7 +101,7 @@ export default class QuadTree {
     this.se?.insert(point);
   }
 
-  query(boundary: QuadRect, foundPoints: GeoPoint[]): GeoPoint[] {
+  query(boundary: Rect, foundPoints: GeoPoint[]): GeoPoint[] {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(...foundPoints.filter((pt) => boundary.contains(pt)));
@@ -71,11 +116,11 @@ export default class QuadTree {
   }
 
   private queryCircle(
-    boundary: QuadRect,
+    boundary: Rect,
     center: GeoPoint,
     radius: number,
     foundPoints: GeoPoint[]
-  ) {
+  ): GeoPoint[] {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(
@@ -93,13 +138,12 @@ export default class QuadTree {
     return foundPoints;
   }
 
-  queryRadius(center: GeoPoint, radius: number, foundPoints: GeoPoint[]) {
-    const boundary = new QuadRect(
-      center.coordinates[0],
-      center.coordinates[1],
-      radius * 2,
-      radius * 2
-    );
+  queryRadius(
+    center: GeoPoint,
+    radius: number,
+    foundPoints: GeoPoint[]
+  ): GeoPoint[] {
+    const boundary = new Rect(center.x, center.y, radius * 2, radius * 2);
 
     return this.queryCircle(boundary, center, radius, foundPoints);
   }
