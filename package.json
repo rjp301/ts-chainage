@@ -1,0 +1,23 @@
+{
+  "name": "ts-chainage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rjp301/ts-chainage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rjp301/ts-chainage/issues"
+  },
+  "homepage": "https://github.com/rjp301/ts-chainage#readme",
+  "dependencies": {
+    "@types/geojson": "^7946.0.10"
+  }
+}
