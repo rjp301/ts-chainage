@@ -148,3 +148,27 @@ export class QuadTree {
     return this.queryCircle(boundary, center, radius, foundPoints);
   }
 }
+
+export function findBoundary(points: GeoPoint[]): Rect {
+  const x_coords = points.map((pt) => pt.x);
+  const y_coords = points.map((pt) => pt.y);
+
+  const x_min = Math.min(...x_coords);
+  const x_max = Math.max(...x_coords);
+  const y_min = Math.min(...y_coords);
+  const y_max = Math.max(...y_coords);
+
+  const cx = (x_max + x_min) / 2;
+  const cy = (y_min + y_max) / 2;
+
+  const w = Math.abs(x_max - x_min) * 1.01;
+  const h = Math.abs(y_max - y_min) * 1.01;
+
+  return new Rect(cx, cy, w, h);
+}
+
+export function createQuadTree(points: GeoPoint[]): QuadTree {
+  const qtree = new QuadTree(findBoundary(points));
+  for (let pt of points) qtree.insert(pt);
+  return qtree;
+}
