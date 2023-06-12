@@ -37,7 +37,7 @@ export class Rect {
   }
 
   intersects(other: Rect): boolean {
-    return (
+    return !(
       other.west_edge > this.east_edge ||
       other.east_edge < this.west_edge ||
       other.north_edge < this.south_edge ||
@@ -101,7 +101,7 @@ export class QuadTree {
     this.se?.insert(point);
   }
 
-  query(boundary: Rect, foundPoints: GeoPoint[]): GeoPoint[] {
+  query(boundary: Rect, foundPoints: GeoPoint[] = []): GeoPoint[] {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(...foundPoints.filter((pt) => boundary.contains(pt)));
@@ -119,7 +119,7 @@ export class QuadTree {
     boundary: Rect,
     center: GeoPoint,
     radius: number,
-    foundPoints: GeoPoint[]
+    foundPoints: GeoPoint[] = []
   ): GeoPoint[] {
     if (!this.boundary.intersects(boundary)) return [];
 
@@ -138,14 +138,10 @@ export class QuadTree {
     return foundPoints;
   }
 
-  queryRadius(
-    center: GeoPoint,
-    radius: number,
-    foundPoints: GeoPoint[]
-  ): GeoPoint[] {
+  queryRadius(center: GeoPoint, radius: number): GeoPoint[] {
     const boundary = new Rect(center.x, center.y, radius * 2, radius * 2);
 
-    return this.queryCircle(boundary, center, radius, foundPoints);
+    return this.queryCircle(boundary, center, radius, []);
   }
 }
 
