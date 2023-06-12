@@ -17,7 +17,4 @@ export default class GeoPolyline implements LineString {
   get coordinates(): number[][] {
     return this.points.map((pt) => pt.coordinates);
   }
-
-  
-
 }

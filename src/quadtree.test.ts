@@ -1,6 +1,6 @@
 import GeoPoint from "./geometry/GeoPoint";
 import { describe, test, expect } from "@jest/globals";
-import { Rect, QuadTree, findBoundary, createQuadTree } from "./quadtree.ts";
+import { Rect, QuadTree, findBoundary, createQuadTree } from "./quadtree";
 
 describe("Rect", () => {
   test("contains() should return true for a point inside the rectangle", () => {
