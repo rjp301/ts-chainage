@@ -24,7 +24,21 @@ export class Rect {
   }
 
   toString() {
-    return `${this.west_edge} ${this.north_edge} ${this.east_edge} ${this.south_edge}`;
+    return `BOUNDARY (${[
+      this.west_edge,
+      this.north_edge,
+      this.east_edge,
+      this.south_edge,
+    ]
+      .map((edge) => Math.round(edge * 1000) / 1000)
+      .join(" ")})`;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    ctx.rect(this.west_edge, this.south_edge, this.w, this.h);
+    ctx.stroke();
+    ctx.closePath();
   }
 
   contains(point: GeoPoint): boolean {
@@ -68,8 +82,8 @@ export class QuadTree {
   }
 
   private subdivide(): void {
-    const cy = this.boundary.cx;
-    const cx = this.boundary.cy;
+    const cx = this.boundary.cx;
+    const cy = this.boundary.cy;
     const w = this.boundary.w / 2;
     const h = this.boundary.h / 2;
 
@@ -85,7 +99,37 @@ export class QuadTree {
     this.divided = true;
   }
 
-  public insert(point: GeoPoint): void {
+  draw(ctx: CanvasRenderingContext2D): void {
+    this.boundary.draw(ctx);
+    if (this.divided) {
+      this.nw?.draw(ctx);
+      this.ne?.draw(ctx);
+      this.sw?.draw(ctx);
+      this.se?.draw(ctx);
+    }
+  }
+
+  toString(): string {
+    const spacing = "\t".repeat(this.depth * 2);
+
+    let result = this.boundary.toString() + "\n";
+    result += spacing + this.points.map((pt) => pt.toString()).join(", ");
+
+    if (!this.divided) return result;
+
+    result += "\n";
+    result += [
+      "NW: " + this.nw?.toString(),
+      "NE: " + this.ne?.toString(),
+      "SE: " + this.se?.toString(),
+      "SW: " + this.sw?.toString(),
+    ]
+      .map((str) => spacing + str)
+      .join("\n");
+    return result;
+  }
+
+  insert(point: GeoPoint): void {
     if (!this.boundary.contains(point)) return;
 
     if (this.points.length < this.capacity) {
@@ -104,7 +148,7 @@ export class QuadTree {
   query(boundary: Rect, foundPoints: GeoPoint[] = []): GeoPoint[] {
     if (!this.boundary.intersects(boundary)) return [];
 
-    foundPoints.push(...foundPoints.filter((pt) => boundary.contains(pt)));
+    foundPoints.push(...this.points.filter((pt) => boundary.contains(pt)));
 
     if (this.divided) {
       this.nw?.query(boundary, foundPoints);
@@ -124,7 +168,7 @@ export class QuadTree {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(
-      ...foundPoints.filter(
+      ...this.points.filter(
         (pt) => boundary.contains(pt) && pt.distOther(center) <= radius
       )
     );

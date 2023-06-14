@@ -1,4 +1,4 @@
-import { createQuadTree } from "../quadtree.js";
+import { Rect, createQuadTree } from "../quadtree.js";
 
 import GeoPoint from "../geometry/GeoPoint.js";
 import GeoLine from "../geometry/GeoLine.js";
@@ -21,7 +21,22 @@ function randomPoint(): GeoPoint {
   return new GeoPoint(x, y);
 }
 
-const pts = Array.from({ length: 20 }, randomPoint);
-console.log(pts);
+const pts = Array.from({ length: 100 }, randomPoint);
+
+const qtree = createQuadTree(pts);
+qtree.draw(ctx);
+// console.log(qtree.toString());
+
+const queryCenter = new GeoPoint(width / 3, height / 3);
+const queryRadius = 50;
+queryCenter.draw(ctx, { radius: queryRadius, color: "#abd669" });
+
+const queried = qtree.queryRadius(queryCenter, queryRadius);
+const boundary = new Rect(200, 200, 200, 200)
+boundary.draw(ctx)
+
+// const queried = qtree.query(boundary)
+console.log("queried", queried);
 
 pts.forEach((pt) => pt.draw(ctx));
+queried.forEach((pt) => pt.draw(ctx, { color: "#598713" }));

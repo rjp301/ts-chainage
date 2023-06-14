@@ -1,5 +1,10 @@
 import { Point } from "geojson";
 
+type GeoPointDrawOptions = {
+  color?: string;
+  radius?: number;
+};
+
 export default class GeoPoint implements Point {
   type: "Point";
 
@@ -19,13 +24,20 @@ export default class GeoPoint implements Point {
     return [this.x, this.y, this.z];
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    const radius = 2.5;
+  draw(ctx: CanvasRenderingContext2D, options: GeoPointDrawOptions = {}) {
+    const radius = options.radius || 2.5;
+    const color = options.color || "#d42c2c";
     ctx.beginPath();
     ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = "#d42c2c";
+    ctx.fillStyle = color;
     ctx.fill();
     ctx.closePath();
+  }
+
+  toString() {
+    return `POINT (${this.coordinates
+      .map((coord) => Math.round(coord * 1000) / 1000)
+      .join(" ")})`;
   }
 
   distOther(other: GeoPoint): number {
