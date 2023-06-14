@@ -1,5 +1,5 @@
 import { LineString } from "geojson";
-import GeoPoint from "./GeoPoint";
+import GeoPoint from "./GeoPoint.js";
 
 export default class GeoLine implements LineString {
   type: "LineString";
@@ -20,6 +20,14 @@ export default class GeoLine implements LineString {
 
   get length() {
     return this.p1.distOther(this.p2);
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    ctx.moveTo(this.p1.x, this.p1.y);
+    ctx.lineTo(this.p2.x, this.p2.y);
+    ctx.stroke();
+    ctx.closePath();
   }
 
   private equation_abc() {

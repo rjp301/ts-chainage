@@ -1,6 +1,6 @@
 import { LineString } from "geojson";
-import GeoPoint from "./GeoPoint";
-import { QuadTree, createQuadTree } from "../quadtree";
+import GeoPoint from "./GeoPoint.js";
+import { QuadTree, createQuadTree } from "../quadtree.js";
 
 export default class GeoPolyline implements LineString {
   type: "LineString";
