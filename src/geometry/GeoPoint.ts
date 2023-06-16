@@ -25,8 +25,9 @@ export default class GeoPoint implements Point {
   }
 
   draw(ctx: CanvasRenderingContext2D, options: GeoPointDrawOptions = {}) {
-    const radius = options.radius || 2.5;
-    const color = options.color || "#d42c2c";
+    const radius = options.radius || 3;
+    const color = options.color || "crimson";
+
     ctx.beginPath();
     ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
     ctx.fillStyle = color;

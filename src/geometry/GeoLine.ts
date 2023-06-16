@@ -1,6 +1,11 @@
 import { LineString } from "geojson";
 import GeoPoint from "./GeoPoint.js";
 
+type GeoLineDrawOptions = {
+  color?: string;
+  width?: number;
+};
+
 export default class GeoLine implements LineString {
   type: "LineString";
 
@@ -22,10 +27,16 @@ export default class GeoLine implements LineString {
     return this.p1.distOther(this.p2);
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, options: GeoLineDrawOptions = {}) {
+    const width = options.width || 2;
+    const color = options.color || "crimson";
+
     ctx.beginPath();
     ctx.moveTo(this.p1.x, this.p1.y);
     ctx.lineTo(this.p2.x, this.p2.y);
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
     ctx.stroke();
     ctx.closePath();
   }
