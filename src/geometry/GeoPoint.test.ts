@@ -1,4 +1,4 @@
-import GeoPoint from "./GeoPoint";
+import GeoPoint from "./GeoPoint.js";
 
 describe("GeoPoint", () => {
   let pt: GeoPoint;

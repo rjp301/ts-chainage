@@ -1,5 +1,3 @@
-import { Rect, createQuadTree } from "../../quadtree.js";
-
 import GeoPoint from "../../geometry/GeoPoint.js";
 import GeoLine from "../../geometry/GeoLine.js";
 
@@ -24,8 +22,15 @@ function randomPoint(): GeoPoint {
 const ln = new GeoLine(randomPoint(), randomPoint());
 ln.draw(ctx);
 
+const ln2 = new GeoLine(randomPoint(), randomPoint());
+ln2.draw(ctx, { color: "blue" });
+console.log(ln2.toString())
+
 const pt = randomPoint();
 pt.draw(ctx);
 
 const moved = ln.moveNode(pt);
 moved.draw(ctx, { color: "green" });
+
+const intersection = ln.intersectionOther(ln2);
+intersection?.draw(ctx, { color: "limegreen" });

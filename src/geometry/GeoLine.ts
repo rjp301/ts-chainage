@@ -27,6 +27,13 @@ export default class GeoLine implements LineString {
     return this.p1.distOther(this.p2);
   }
 
+  toString() {
+    const roundValue = (val: number) => Math.round(val * 1000) / 1000;
+    return `LINESTRING (${this.coordinates
+      .map((coord) => coord.map(roundValue).join(" "))
+      .join(", ")})`;
+  }
+
   draw(ctx: CanvasRenderingContext2D, options: GeoLineDrawOptions = {}) {
     const width = options.width || 2;
     const color = options.color || "crimson";
