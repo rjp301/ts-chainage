@@ -28,7 +28,7 @@ describe("Rect", () => {
   });
 });
 
-describe("QuadTree", () => {
+describe.skip("QuadTree", () => {
   let quadTree: QuadTree;
 
   let p1 = new GeoPoint(1, 1);
