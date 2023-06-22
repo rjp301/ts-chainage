@@ -20,6 +20,16 @@ function randomPoint(): GeoPoint {
   return new GeoPoint(x, y);
 }
 
+function randomPointNearPolyline(pl: GeoPolyline): GeoPoint {
+  let pt = randomPoint();
+  let i = 0;
+  while (!pl.distNode(pt) && i < 30) {
+    pt = randomPoint();
+    i += 1;
+  }
+  return pt;
+}
+
 let currentPoint = new GeoPoint(buffer, buffer);
 const points: GeoPoint[] = [currentPoint];
 const roughNumPoints = 10;
@@ -28,8 +38,7 @@ let i = 0;
 while (i < 2 * roughNumPoints) {
   const newPoint = new GeoPoint(
     currentPoint.x + getRandomNumber(0, width / roughNumPoints),
-    buffer
-    // currentPoint.y + getRandomNumber(0, height / roughNumPoints)
+    currentPoint.y + getRandomNumber(0, height / roughNumPoints)
   );
 
   if (newPoint.x > width - buffer) break;
@@ -39,24 +48,26 @@ while (i < 2 * roughNumPoints) {
   i++;
 }
 
-const interpolation = 0.25;
-
 const pl = new GeoPolyline(points);
+console.table(pl.segments.map((seg) => seg.length / pl.length));
+
 pl.draw(ctx);
+pl.points.forEach((pt) => pt.draw(ctx, { radius: 2.5 }));
 
-new GeoLine(
-  new GeoPoint(pl.length * interpolation + buffer, 0),
-  new GeoPoint(pl.length * interpolation + buffer, height)
-).draw(ctx, { color: "green" });
+const pt = randomPointNearPolyline(pl);
+pt.draw(ctx);
 
-// const pt = randomPoint();
-// pt.draw(ctx);
+const moved = pl.moveNode(pt);
+moved.draw(ctx, { color: "blue" });
 
-// const moved = pl.moveNode(pt);
-// moved.draw(ctx, { color: "blue" });
+const touching = pl.nearestSegment(pt);
+touching?.draw(ctx, { color: "blue" });
 
-// const touching = pl.nearestSegment(pt);
-// touching?.draw(ctx, { color: "blue" });
+console.log("projected", pl.project(pt));
 
-pl.interpolate(interpolation).draw(ctx, { color: "purple", radius: 5 });
-pl.points.forEach((pt) => pt.draw(ctx));
+const interpolation = 0.25;
+const interpolated = pl.interpolate(interpolation);
+interpolated.draw(ctx, { color: "purple", radius: 5 });
+
+const projected = pl.project(interpolated);
+console.log("interpolation", interpolation, "projected", projected);

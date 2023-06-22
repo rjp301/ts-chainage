@@ -80,9 +80,9 @@ export default class GeoPolyline implements LineString {
 
     const nearestVertexDist = nearestVertex.distOther(node);
 
-    const sortedSegments = this.segments.sort(
-      (a, b) => a.distNode(node) - b.distNode(node)
-    );
+    const sortedSegments = this.segments
+      .slice()
+      .sort((a, b) => a.distNode(node) - b.distNode(node));
 
     for (let segment of sortedSegments) {
       const distance = segment.distNode(node);
@@ -105,23 +105,10 @@ export default class GeoPolyline implements LineString {
     return segment ? segment.touchingNode(node) : false;
   }
 
-  // distNode(node: GeoPoint): number | undefined {
-  //   const segment = this.nearestSegment(node);
-
-  //   const distance = segment?.distNode();
-  // }
-
-  // splice(p1: GeoPoint, p2: GeoPoint): GeoLine {
-  //   const p1_segment = this.nearestSegment(p1);
-  //   const p2_segment = this.nearestSegment(p2);
-  // }
-
-  // // not implemented
-  // private project(node: GeoPoint): number {
-  //   // moves node to closest point on polyline
-  //   // return distance from start of polyline to moved point as percentage of length
-  //   return;
-  // }
+  distNode(node: GeoPoint, signed = false): number | undefined {
+    const segment = this.nearestSegment(node);
+    return segment?.distNode(node, signed);
+  }
 
   interpolate(dist: number): GeoPoint {
     if (dist > 1) return this.points[this.points.length - 1];
@@ -129,15 +116,30 @@ export default class GeoPolyline implements LineString {
 
     let cumulative = 0;
     for (let segment of this.segments) {
-      const segmentStep = segment.length / this.length;
+      let segmentStep = segment.length / this.length;
       if (cumulative + segmentStep >= dist) {
         const finalInterpolation = (dist - cumulative) / segmentStep;
+        console.log("finalInterpolation", finalInterpolation);
         return segment.interpolate(finalInterpolation);
       }
       cumulative += segmentStep;
+      console.log("segment step", segmentStep, "cumulative", cumulative);
     }
     console.error("Could not interpolate along the polyline");
     return this.points[0];
+  }
+
+  project(node: GeoPoint): number {
+    let cumulative = 0;
+    for (let segment of this.segments) {
+      const segmentStep = segment.length / this.length;
+      const projected = segment.project(node);
+      if (projected >= 0 && projected <= 1) {
+        return cumulative + projected * segmentStep;
+      }
+      cumulative += segmentStep;
+    }
+    return cumulative;
   }
 
   private reversed(): GeoPolyline {
