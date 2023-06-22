@@ -136,4 +136,22 @@ export default class GeoLine implements LineString {
 
     return new GeoPoint(x, y);
   }
+
+  interpolate(dist: number): GeoPoint {
+    if (dist < 0) return this.p1;
+    if (dist > 1) return this.p2;
+
+    const x = (1 - dist) * this.p1.x + dist * this.p2.x;
+    const y = (1 - dist) * this.p1.y + dist * this.p2.y;
+    return new GeoPoint(x, y);
+  }
+
+  project(node: GeoPoint): number {
+    const movedNode = this.moveNode(node);
+    const dot_product =
+      (movedNode.x - this.p1.x) * (this.p2.x - this.p1.x) +
+      (movedNode.y - this.p1.y) * (this.p2.y - this.p1.y);
+    const sign = dot_product > 0 ? 1 : -1;
+    return (this.p1.distOther(movedNode) * sign) / this.length;
+  }
 }

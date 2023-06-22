@@ -22,12 +22,16 @@ function randomPoint(): GeoPoint {
 const ln = new GeoLine(randomPoint(), randomPoint());
 ln.draw(ctx);
 
+ln.interpolate(0.25).draw(ctx, { color: "purple" });
+
 const ln2 = new GeoLine(randomPoint(), randomPoint());
 ln2.draw(ctx, { color: "blue" });
-console.log(ln2.toString())
 
 const pt = randomPoint();
 pt.draw(ctx);
+
+const projected = ln.project(pt);
+console.log("projected", projected);
 
 const moved = ln.moveNode(pt);
 moved.draw(ctx, { color: "green" });

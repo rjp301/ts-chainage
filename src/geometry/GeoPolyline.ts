@@ -100,6 +100,22 @@ export default class GeoPolyline implements LineString {
     return this.segments.find((seg) => seg.touchingNode(movedNode));
   }
 
+  touchingNode(node: GeoPoint): boolean {
+    const segment = this.nearestSegment(node);
+    return segment ? segment.touchingNode(node) : false;
+  }
+
+  // distNode(node: GeoPoint): number | undefined {
+  //   const segment = this.nearestSegment(node);
+
+  //   const distance = segment?.distNode();
+  // }
+
+  // splice(p1: GeoPoint, p2: GeoPoint): GeoLine {
+  //   const p1_segment = this.nearestSegment(p1);
+  //   const p2_segment = this.nearestSegment(p2);
+  // }
+
   // // not implemented
   // private project(node: GeoPoint): number {
   //   // moves node to closest point on polyline
@@ -107,11 +123,22 @@ export default class GeoPolyline implements LineString {
   //   return;
   // }
 
-  // // not implemented
-  // private interpolate(dist: number): GeoPoint {
-  //   // returns points given distance from start of polyine as percentage of length
-  //   return;
-  // }
+  interpolate(dist: number): GeoPoint {
+    if (dist > 1) return this.points[this.points.length - 1];
+    if (dist < 0) return this.points[0];
+
+    let cumulative = 0;
+    for (let segment of this.segments) {
+      const segmentStep = segment.length / this.length;
+      if (cumulative + segmentStep >= dist) {
+        const finalInterpolation = (dist - cumulative) / segmentStep;
+        return segment.interpolate(finalInterpolation);
+      }
+      cumulative += segmentStep;
+    }
+    console.error("Could not interpolate along the polyline");
+    return this.points[0];
+  }
 
   private reversed(): GeoPolyline {
     const points = this.points.reverse();
