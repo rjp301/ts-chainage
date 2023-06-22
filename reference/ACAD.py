@@ -333,7 +333,8 @@ class Polyline:
             zip(self.segments, [i.dist_to_pt(node) for i in self.segments]),
             key=lambda i: i[1],
         ):
-            # If a vertex is the nearest part of the polyline to the node, return vertex
+            # If a vertex is the nearest part of the 
+            # polyline to the node, return vertex
             if distance >= nearest_pt_dist:
                 return nearest_pt
 

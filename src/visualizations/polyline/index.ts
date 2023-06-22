@@ -21,7 +21,7 @@ function randomPoint(): GeoPoint {
 
 let currentPoint = new GeoPoint(buffer, buffer);
 const points: GeoPoint[] = [currentPoint];
-const roughNumPoints = 20;
+const roughNumPoints = 10;
 
 let i = 0;
 while (i < 2 * roughNumPoints) {
@@ -39,3 +39,12 @@ while (i < 2 * roughNumPoints) {
 
 const pl = new GeoPolyline(points);
 pl.draw(ctx);
+
+const pt = randomPoint();
+pt.draw(ctx);
+
+const moved = pl.moveNode(pt);
+moved.draw(ctx, { color: "blue" });
+
+const touching = pl.nearestSegment(pt);
+touching?.draw(ctx, { color: "blue" });

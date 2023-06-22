@@ -46,4 +46,8 @@ export default class GeoPoint implements Point {
     const deltaY = this.coordinates[1] - other.coordinates[1];
     return Math.hypot(deltaX, deltaY);
   }
+
+  nearest(others: GeoPoint[]): GeoPoint | undefined {
+    return others.sort((a, b) => this.distOther(a) - this.distOther(b))[0];
+  }
 }
