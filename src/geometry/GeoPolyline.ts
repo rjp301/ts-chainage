@@ -147,18 +147,51 @@ export default class GeoPolyline implements LineString {
     return new GeoPolyline(points);
   }
 
-  // // not implemented
-  // private substring(proj1: number, proj2: number): GeoPolyline {
-  //   // returns sub section of polyline from one projection to another
-  //   // result may be reversed if first number is higher than second
-  //   return;
-  // }
+  splice(p1: GeoPoint, p2: GeoPoint): GeoPolyline | undefined {
+    type info = {
+      pt: GeoPoint;
+      segment: GeoLine;
+      index: number;
+      moved: GeoPoint;
+    };
 
-  // splice(p1: GeoPoint, p2: GeoPoint): GeoPolyline {
-  //   const p1_proj = this.project(p1);
-  //   const p2_proj = this.project(p2);
-  //   const proj1 = Math.min(p1_proj, p2_proj);
-  //   const proj2 = Math.max(p1_proj, p2_proj);
-  //   return this.substring(proj1, proj2);
-  // }
+    const p1_segment = this.nearestSegment(p1);
+    const p2_segment = this.nearestSegment(p2);
+    if (!p1_segment || !p2_segment) return;
+
+    const p1_moved = this.moveNode(p1);
+    const p2_moved = this.moveNode(p2);
+    if (!p1_moved || !p2_moved) return;
+
+    const p1_index = this.segments.indexOf(p1_segment);
+    const p2_index = this.segments.indexOf(p2_segment);
+    if (!p1_index || !p2_index) return;
+
+    let p1_info: info = {
+      pt: p1,
+      segment: p1_segment,
+      moved: p1_moved,
+      index: p1_index,
+    };
+    let p2_info: info = {
+      pt: p2,
+      segment: p2_segment,
+      moved: p2_moved,
+      index: p2_index,
+    };
+
+    if (p1_info.index > p2_info.index) [p1_info, p2_info] = [p2_info, p1_info];
+
+    const vertices: GeoPoint[] = [];
+    let index = p1_info.index;
+    vertices.push(p1_info.moved!);
+
+    while (index < p2_info.index) {
+      vertices.push(this.segments[index].p2);
+      index += 1;
+    }
+
+    vertices.push(p2_info.moved);
+    return new GeoPolyline(vertices);
+  }
 }
