@@ -49,7 +49,6 @@ while (i < 2 * roughNumPoints) {
 }
 
 const pl = new GeoPolyline(points);
-console.table(pl.segments.map((seg) => seg.length / pl.length));
 
 pl.draw(ctx);
 pl.points.forEach((pt) => pt.draw(ctx, { radius: 2.5 }));
