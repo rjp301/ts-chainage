@@ -36,7 +36,7 @@ export default class Centerline {
     const nearest = node.nearest(nearbyMarkers) as Marker | undefined;
 
     if (nearest == undefined) {
-      console.log("find_KP: node is not in proximity to any markers");
+      // console.log("find_KP: node is not in proximity to any markers");
       return;
     }
 

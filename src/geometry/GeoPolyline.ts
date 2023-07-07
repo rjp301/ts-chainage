@@ -8,11 +8,13 @@ type GeoPolylineDrawOptions = {
   width?: number;
 };
 
+type Segment = GeoLine & { id: number };
+
 export default class GeoPolyline implements LineString {
   type: "LineString";
 
   points: GeoPoint[];
-  segments: GeoLine[];
+  segments: Segment[];
   qTree: QuadTree;
   qRadius: number;
   length: number;
@@ -119,22 +121,24 @@ export default class GeoPolyline implements LineString {
       let segmentStep = segment.length / this.length;
       if (cumulative + segmentStep >= dist) {
         const finalInterpolation = (dist - cumulative) / segmentStep;
-        console.log("finalInterpolation", finalInterpolation);
+        // console.log("finalInterpolation", finalInterpolation);
         return segment.interpolate(finalInterpolation);
       }
       cumulative += segmentStep;
-      console.log("segment step", segmentStep, "cumulative", cumulative);
+      // console.log("segment step", segmentStep, "cumulative", cumulative);
     }
     console.error("Could not interpolate along the polyline");
     return this.points[0];
   }
 
-  project(node: GeoPoint): number {
+  project(node: GeoPoint): number | undefined {
+    const movedNode = this.moveNode(node);
+
     let cumulative = 0;
     for (let segment of this.segments) {
       const segmentStep = segment.length / this.length;
-      const projected = segment.project(node);
-      if (projected >= 0 && projected <= 1) {
+      if (segment.touchingNode(movedNode)) {
+        const projected = segment.project(node);
         return cumulative + projected * segmentStep;
       }
       cumulative += segmentStep;
