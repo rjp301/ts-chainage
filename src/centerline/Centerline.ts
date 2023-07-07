@@ -38,42 +38,87 @@ export default class Centerline {
     const projection = this.line.project(node);
     if (projection === undefined) return;
 
-    const getLower = (i: Marker) =>
-      i.projection !== undefined && i.projection < projection;
+    if (projection === 0 && this.markers[0].projection === 0) {
+      return this.markers[0].value;
+    }
 
-    const getHigher = (i: Marker) =>
-      i.projection !== undefined && i.projection >= projection;
+    if (
+      projection >= 1 &&
+      this.markers[this.markers.length - 1].projection === 1
+    ) {
+      return this.markers[this.markers.length - 1].value;
+    }
 
-    const lowerElements = this.markers.filter(getLower);
-    const higherElements = this.markers.filter(getHigher);
+    const lowerMarkers = this.markers.filter(
+      (i) => i.projection !== undefined && i.projection < projection
+    );
+    const higherMarkers = this.markers.filter(
+      (i) => i.projection !== undefined && i.projection > projection
+    );
 
+    let m1: Marker;
+    let m2: Marker;
 
-    const compareProximity = (a: Marker, b: Marker) => {
-      const distanceA = Math.abs(a.projection - projection);
-      const distanceB = Math.abs(b.projection - projection);
-      return distanceA - distanceB;
-    };
+    if (lowerMarkers.length > 0 && higherMarkers.length > 0) {
+      m1 = lowerMarkers[lowerMarkers.length - 1];
+      m2 = higherMarkers[0];
+    } else if (
+      (lowerMarkers.length === 0 && higherMarkers.length >= 2) ||
+      projection === 0
+    ) {
+      m1 = higherMarkers[0];
+      m2 = higherMarkers[1];
+    } else if (
+      (lowerMarkers.length >= 2 && higherMarkers.length === 0) ||
+      projection === 1
+    ) {
+      m1 = lowerMarkers[lowerMarkers.length - 2];
+      m2 = lowerMarkers[lowerMarkers.length - 1];
+    } else {
+      return;
+    }
 
-    const compareProjection = (a: Marker, b: Marker) =>
-      a.projection - b.projection;
+    const valueDelta = m2.value - m1.value;
+    const projectionDelta = m2.projection! - m1.projection!;
+    return (
+      m1.value + ((projection - m1.projection!) * valueDelta) / projectionDelta
+    );
 
-    const twoClosest = this.markers
-      .slice()
-      .sort(compareProximity)
-      .slice(0, 2)
-      .sort(compareProjection);
+    // const getLower = (i: Marker) =>
+    //   i.projection !== undefined && i.projection < projection;
+
+    // const getHigher = (i: Marker) =>
+    //   i.projection !== undefined && i.projection >= projection;
+
+    // const lowerElements = this.markers.filter(getLower);
+    // const higherElements = this.markers.filter(getHigher);
+
+    // const compareProximity = (a: Marker, b: Marker) => {
+    //   const distanceA = Math.abs(a.projection - projection);
+    //   const distanceB = Math.abs(b.projection - projection);
+    //   return distanceA - distanceB;
+    // };
+
+    // const compareProjection = (a: Marker, b: Marker) =>
+    //   a.projection - b.projection;
+
+    // const twoClosest = this.markers
+    //   .slice()
+    //   .sort(compareProximity)
+    //   .slice(0, 2)
+    //   .sort(compareProjection);
 
     // console.log(projection)
     // console.log(twoClosest.map(i => i.projection))
-    
-    const m1 = twoClosest[0];
-    const m2 = twoClosest[1];
 
-    const valueDelta = m2.value - m1.value;
-    const projectionDelta = m2.projection - m1.projection;
-    return (
-      m1.value + ((projection - m1.projection) * valueDelta) / projectionDelta
-    );
+    // const m1 = twoClosest[0];
+    // const m2 = twoClosest[1];
+
+    // const valueDelta = m2.value - m1.value;
+    // const projectionDelta = m2.projection - m1.projection;
+    // return (
+    //   m1.value + ((projection - m1.projection) * valueDelta) / projectionDelta
+    // );
 
     // const nearbyMarkers = this.qTree.queryRadius(node, this.qRadius);
     // const nearest = node.nearest(nearbyMarkers) as Marker | undefined;

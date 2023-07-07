@@ -62,12 +62,14 @@ export function createPolyline(
 }
 
 export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
-  const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.04;
+  const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.05;
   const markers: Marker[] = [];
   for (let i = 0; i < numMarkers; i++) {
-    const pt = pl.interpolate(i * spacing * getRandomNumber(0.95, 1.05));
-    const value = pl.length * i * spacing * getRandomNumber(0.9, 1.1);
+    const pt = pl.interpolate(i * spacing);
+    const value = pl.length * i * spacing * getRandomNumber(0.99, 1.01);
     markers.push(new Marker(pt.x, pt.y, value));
   }
-  return markers;
+  return markers.sort(
+    (a, b) => pl.project(a.toPoint())! - pl.project(b.toPoint())!
+  );
 }

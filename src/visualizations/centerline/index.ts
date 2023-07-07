@@ -1,4 +1,6 @@
 import Centerline from "../../centerline/Centerline.js";
+import Marker from "../../centerline/Marker.js";
+import GeoLine from "../../geometry/GeoLine.js";
 import GeoPoint from "../../geometry/GeoPoint.js";
 import GeoPolyline from "../../geometry/GeoPolyline.js";
 import formatKP from "../../utils/formatKP.js";
@@ -30,54 +32,79 @@ const pl = createPolyline(canvas, 10);
 const markers = createMarkers(pl);
 const CL = new Centerline(pl, markers);
 
-// PLOT every chainage
-const nearPoints: GeoPoint[] = Array(1000)
-  .fill(null)
-  .map(() => randomPointNearPolyline(pl, canvas));
-console.log(nearPoints);
-
-const plotChainage = (pt: GeoPoint): GeoPoint | undefined => {
-  const chainage = CL.find_KP(pt);
-  const projection = CL.line.project(pt);
-
-  if (chainage === undefined || projection === undefined) return;
-
-  const { height, width } = canvas;
-  const x = projection * width * 0.9;
-  const y = height - chainage * 0.05 - 20;
-  return new GeoPoint(x, y);
-};
-
-const plotPoints = nearPoints
-  .map(plotChainage)
-  .filter((i) => i !== undefined) as GeoPoint[];
-
-const plotPl = new GeoPolyline(plotPoints.sort((a, b) => a.x - b.x));
-
 function drawLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  pl.draw(ctx);
-  plotPl.draw(ctx);
 
   CL.draw(ctx);
 
   const mousePoint = new GeoPoint(mousePosition.x, mousePosition.y);
   const movedPoint = pl.moveNode(mousePoint);
 
-  mousePoint.draw(ctx, { color: "green" });
-  movedPoint?.draw(ctx, { color: "blue" });
+  if (movedPoint !== undefined) {
+    new GeoLine(mousePoint, movedPoint).draw(ctx, { color: "blue" });
+    movedPoint.draw(ctx, { color: "blue" });
+  }
 
-  const chainage = CL.find_KP(mousePoint);
-  const projected = pl.project(mousePoint);
+  const projection = CL.line.project(mousePoint);
+  let chainage;
 
-  ctx.font = "12px Courier";
-  ctx.fillStyle = "red";
+  if (projection !== undefined) {
 
-  if (projected !== undefined)
-    ctx.fillText(round3(projected).toString(), mousePoint.x + 7, mousePoint.y);
-  if (chainage !== undefined)
-    ctx.fillText(formatKP(chainage), mousePoint.x + 7, mousePoint.y + 16);
+
+    const lowerMarkers = CL.markers.filter(
+      (i) => i.projection !== undefined && i.projection < projection
+    );
+    const higherMarkers = CL.markers.filter(
+      (i) => i.projection !== undefined && i.projection > projection
+    );
+    lowerMarkers.forEach((i) =>
+      i.toPoint().draw(ctx, { color: "green", radius: 5 })
+    );
+    higherMarkers.forEach((i) =>
+      i.toPoint().draw(ctx, { color: "darkcyan", radius: 5 })
+    );
+
+    let m1: Marker;
+    let m2: Marker;
+
+    if (lowerMarkers.length > 0 && higherMarkers.length > 0) {
+      m1 = lowerMarkers[lowerMarkers.length - 1];
+      m2 = higherMarkers[0];
+    } else if (
+      (lowerMarkers.length === 0 && higherMarkers.length >= 2) ||
+      projection === 0
+    ) {
+      m1 = higherMarkers[0];
+      m2 = higherMarkers[1];
+    } else if (
+      (lowerMarkers.length >= 2 && higherMarkers.length === 0) ||
+      projection === 1
+    ) {
+      m1 = lowerMarkers[lowerMarkers.length - 2];
+      m2 = lowerMarkers[lowerMarkers.length - 1];
+    } else {
+      return;
+    }
+
+    console.log(
+      round3(projection),
+      round3(m1.projection),
+      round3(m2.projection),
+      lowerMarkers.length,
+      higherMarkers.length
+    );
+
+    m1.toPoint().draw(ctx, { color: "lightgreen", radius: 2 });
+    m2.toPoint().draw(ctx, { color: "cyan", radius: 2 });
+
+    const chainage = CL.find_KP(mousePoint);
+
+    if (chainage !== undefined) {
+      ctx.font = "12px Courier";
+      ctx.fillStyle = "red";
+      ctx.fillText(formatKP(chainage), mousePoint.x + 7, mousePoint.y);
+    }
+  }
 
   requestAnimationFrame(drawLoop);
 }

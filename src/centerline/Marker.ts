@@ -17,7 +17,7 @@ export default class Marker extends GeoPoint {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    super.draw(ctx, { color: "purple", radius: 4 });
+    super.draw(ctx, { radius: 4 });
     const projection: string =
       this.projection !== undefined
         ? String(Math.round(this.projection * 1000) / 1000)
@@ -25,7 +25,10 @@ export default class Marker extends GeoPoint {
 
     ctx.font = "12px Courier";
     ctx.fillStyle = "darkgray";
-    ctx.fillText(formatKP(this.value), this.x + 5, this.y);
-    ctx.fillText(projection, this.x + 5, this.y + 16);
+    ctx.fillText(formatKP(this.value), this.x + 8, this.y + 3);
+  }
+
+  toPoint(): GeoPoint {
+    return new GeoPoint(this.x, this.y);
   }
 }
