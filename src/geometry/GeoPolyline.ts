@@ -8,13 +8,11 @@ type GeoPolylineDrawOptions = {
   width?: number;
 };
 
-type Segment = GeoLine & { id: number };
-
 export default class GeoPolyline implements LineString {
   type: "LineString";
 
   points: GeoPoint[];
-  segments: Segment[];
+  segments: GeoLine[];
   qTree: QuadTree;
   qRadius: number;
   length: number;
@@ -76,9 +74,9 @@ export default class GeoPolyline implements LineString {
     return node.nearest(points);
   }
 
-  moveNode(node: GeoPoint): GeoPoint {
+  moveNode(node: GeoPoint): GeoPoint | undefined {
     const nearestVertex = this.nearestVertex(node);
-    if (!nearestVertex) return node;
+    if (!nearestVertex) return;
 
     const nearestVertexDist = nearestVertex.distOther(node);
 
@@ -99,6 +97,7 @@ export default class GeoPolyline implements LineString {
 
   nearestSegment(node: GeoPoint): GeoLine | undefined {
     const movedNode = this.moveNode(node);
+    if (!movedNode) return;
     return this.segments.find((seg) => seg.touchingNode(movedNode));
   }
 
@@ -133,6 +132,7 @@ export default class GeoPolyline implements LineString {
 
   project(node: GeoPoint): number | undefined {
     const movedNode = this.moveNode(node);
+    if (!movedNode) return;
 
     let cumulative = 0;
     for (let segment of this.segments) {

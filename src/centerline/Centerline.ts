@@ -16,7 +16,10 @@ export default class Centerline {
 
   constructor(line: GeoPolyline, markers: Marker[], name = "Unnamed") {
     this.line = line;
-    this.markers = markers.sort((a, b) => a.value - b.value);
+    this.markers = markers
+      .map((obj) => obj.calcProjection(line))
+      .filter((obj) => obj.projection !== undefined)
+      .sort((a, b) => a.value - b.value);
     this.name = name;
 
     this.qTree = createQuadTree(markers);
@@ -32,26 +35,65 @@ export default class Centerline {
   }
 
   find_KP(node: GeoPoint): number | undefined {
-    const nearbyMarkers = this.qTree.queryRadius(node, this.qRadius);
-    const nearest = node.nearest(nearbyMarkers) as Marker | undefined;
+    const projection = this.line.project(node);
+    if (projection === undefined) return;
 
-    if (nearest == undefined) {
-      // console.log("find_KP: node is not in proximity to any markers");
-      return;
-    }
+    const getLower = (i: Marker) =>
+      i.projection !== undefined && i.projection < projection;
 
-    const k1 = nearest.value;
-    const p1 = this.line.project(nearest);
-    const p = this.line.project(node);
+    const getHigher = (i: Marker) =>
+      i.projection !== undefined && i.projection >= projection;
 
-    const nearest_i = this.markers.map((i) => i.value).indexOf(nearest.value);
-    const next_marker_i = p > p1 ? nearest_i + 1 : nearest_i - 1;
-    const next_marker = this.markers[next_marker_i];
+    const lowerElements = this.markers.filter(getLower);
+    const higherElements = this.markers.filter(getHigher);
 
-    const k2 = next_marker.value;
-    const p2 = this.line.project(next_marker);
 
-    return k1 + ((p - p1) * (k2 - k1)) / (p2 - p1);
+    const compareProximity = (a: Marker, b: Marker) => {
+      const distanceA = Math.abs(a.projection - projection);
+      const distanceB = Math.abs(b.projection - projection);
+      return distanceA - distanceB;
+    };
+
+    const compareProjection = (a: Marker, b: Marker) =>
+      a.projection - b.projection;
+
+    const twoClosest = this.markers
+      .slice()
+      .sort(compareProximity)
+      .slice(0, 2)
+      .sort(compareProjection);
+
+    // console.log(projection)
+    // console.log(twoClosest.map(i => i.projection))
+    
+    const m1 = twoClosest[0];
+    const m2 = twoClosest[1];
+
+    const valueDelta = m2.value - m1.value;
+    const projectionDelta = m2.projection - m1.projection;
+    return (
+      m1.value + ((projection - m1.projection) * valueDelta) / projectionDelta
+    );
+
+    // const nearbyMarkers = this.qTree.queryRadius(node, this.qRadius);
+    // const nearest = node.nearest(nearbyMarkers) as Marker | undefined;
+
+    // if (!nearest) return;
+
+    // const k1 = nearest.value;
+    // const p1 = this.line.project(nearest);
+    // const p = this.line.project(node);
+
+    // if (!p1 || !p) return;
+
+    // const nearest_i = this.markers.map((i) => i.value).indexOf(nearest.value);
+    // const next_marker_i = p > p1 ? nearest_i + 1 : nearest_i - 1;
+    // const next_marker = this.markers[next_marker_i];
+
+    // const k2 = next_marker.value;
+    // const p2 = this.line.project(next_marker);
+
+    // return k1 + ((p - p1) * (k2 - k1)) / (p2 - p1);
   }
 
   from_KP(KP: number): GeoPoint | undefined {

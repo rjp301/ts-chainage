@@ -146,12 +146,17 @@ export default class GeoLine implements LineString {
     return new GeoPoint(x, y);
   }
 
-  project(node: GeoPoint): number {
+  project(node: GeoPoint, constrained = true): number {
     const movedNode = this.moveNode(node);
+
     const dot_product =
       (movedNode.x - this.p1.x) * (this.p2.x - this.p1.x) +
       (movedNode.y - this.p1.y) * (this.p2.y - this.p1.y);
     const sign = dot_product > 0 ? 1 : -1;
-    return (this.p1.distOther(movedNode) * sign) / this.length;
+
+    const value = (this.p1.distOther(movedNode) / this.length) * sign;
+    if (!constrained) return value;
+
+    return Math.min(Math.max(0, value), 1);
   }
 }

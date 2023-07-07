@@ -2,7 +2,7 @@ import Marker from "../centerline/Marker.js";
 import GeoPoint from "../geometry/GeoPoint.js";
 import GeoPolyline from "../geometry/GeoPolyline.js";
 
-function calcBuffer(canvas: HTMLCanvasElement): number {
+export function calcBuffer(canvas: HTMLCanvasElement): number {
   return Math.hypot(canvas.width, canvas.height) * 0.05;
 }
 
@@ -62,12 +62,12 @@ export function createPolyline(
 }
 
 export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
-  const spacing = Math.trunc(pl.length / (numMarkers - 1)) / pl.length * 1.04;
-  console.log(spacing);
+  const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.04;
   const markers: Marker[] = [];
   for (let i = 0; i < numMarkers; i++) {
-    const pt = pl.interpolate(i * spacing);
-    markers.push(new Marker(pt.x, pt.y, pl.length * i * spacing));
+    const pt = pl.interpolate(i * spacing * getRandomNumber(0.95, 1.05));
+    const value = pl.length * i * spacing * getRandomNumber(0.9, 1.1);
+    markers.push(new Marker(pt.x, pt.y, value));
   }
   return markers;
 }
