@@ -49,8 +49,6 @@ function drawLoop() {
   let chainage;
 
   if (projection !== undefined) {
-
-
     const lowerMarkers = CL.markers.filter(
       (i) => i.projection !== undefined && i.projection < projection
     );
@@ -86,14 +84,6 @@ function drawLoop() {
       return;
     }
 
-    console.log(
-      round3(projection),
-      round3(m1.projection),
-      round3(m2.projection),
-      lowerMarkers.length,
-      higherMarkers.length
-    );
-
     m1.toPoint().draw(ctx, { color: "lightgreen", radius: 2 });
     m2.toPoint().draw(ctx, { color: "cyan", radius: 2 });
 
@@ -103,6 +93,12 @@ function drawLoop() {
       ctx.font = "12px Courier";
       ctx.fillStyle = "red";
       ctx.fillText(formatKP(chainage), mousePoint.x + 7, mousePoint.y);
+
+      const pt = CL.from_KP(chainage);
+
+      if (pt !== undefined) {
+        pt.draw(ctx, { color: "purple", radius: 6 });
+      }
     }
   }
 

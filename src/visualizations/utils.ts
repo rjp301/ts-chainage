@@ -62,7 +62,7 @@ export function createPolyline(
 }
 
 export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
-  const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.05;
+  const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.0;
   const markers: Marker[] = [];
   for (let i = 0; i < numMarkers; i++) {
     const pt = pl.interpolate(i * spacing);
@@ -71,5 +71,5 @@ export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
   }
   return markers.sort(
     (a, b) => pl.project(a.toPoint())! - pl.project(b.toPoint())!
-  );
+  ).slice(1);
 }
