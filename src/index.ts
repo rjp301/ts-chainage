@@ -10,8 +10,9 @@ import {
 
 import Centerline from "./centerline/Centerline.js";
 import Marker from "./centerline/Marker.js";
+import formatKP from "./utils/formatKP.js";
 
-export default {
+export {
   GeoPoint,
   GeoLine,
   GeoPolyline,
@@ -21,4 +22,5 @@ export default {
   Rect,
   Centerline,
   Marker,
+  formatKP,
 };

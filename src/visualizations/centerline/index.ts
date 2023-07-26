@@ -1,9 +1,11 @@
-import Centerline from "../../centerline/Centerline.js";
-import Marker from "../../centerline/Marker.js";
-import GeoLine from "../../geometry/GeoLine.js";
-import GeoPoint from "../../geometry/GeoPoint.js";
-import GeoPolyline from "../../geometry/GeoPolyline.js";
-import formatKP from "../../utils/formatKP.js";
+import {
+  Centerline,
+  Marker,
+  GeoLine,
+  GeoPoint,
+  formatKP,
+} from "@/index.js";
+
 import {
   calcBuffer,
   createMarkers,

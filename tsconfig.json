@@ -10,6 +10,11 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "./src"

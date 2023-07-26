@@ -201,8 +201,8 @@ export function findBoundary(points: GeoPoint[]): Rect {
   const cx = (x_max + x_min) / 2;
   const cy = (y_min + y_max) / 2;
 
-  const w = Math.abs(x_max - x_min) * 1.01;
-  const h = Math.abs(y_max - y_min) * 1.01;
+  const w = Math.abs(x_max - x_min) * 1.01 || 5;
+  const h = Math.abs(y_max - y_min) * 1.01 || 5;
 
   return new Rect(cx, cy, w, h);
 }
