@@ -1,4 +1,4 @@
-import GeoPoint from "./GeoPoint.js";
+import GeoPoint from "./Point.js";
 import { Rect, QuadTree, findBoundary, createQuadTree } from "./QuadTree.js";
 
 describe("Rect", () => {

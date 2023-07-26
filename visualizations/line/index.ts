@@ -1,5 +1,4 @@
-import GeoPoint from "../../geometry/GeoPoint.js";
-import GeoLine from "../../geometry/GeoLine.js";
+import { Point, Line } from "@/index.js";
 
 const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -12,19 +11,19 @@ function getRandomNumber(min: number, max: number): number {
   return randomNumber;
 }
 
-function randomPoint(): GeoPoint {
+function randomPoint(): Point {
   const buffer = Math.hypot(width, height) * 0.05;
   const x = getRandomNumber(buffer, width - buffer);
   const y = getRandomNumber(buffer, height - buffer);
-  return new GeoPoint(x, y);
+  return new Point(x, y);
 }
 
-const ln = new GeoLine(randomPoint(), randomPoint());
+const ln = new Line(randomPoint(), randomPoint());
 ln.draw(ctx);
 
 ln.interpolate(0.25).draw(ctx, { color: "purple" });
 
-const ln2 = new GeoLine(randomPoint(), randomPoint());
+const ln2 = new Line(randomPoint(), randomPoint());
 ln2.draw(ctx, { color: "blue" });
 
 const pt = randomPoint();

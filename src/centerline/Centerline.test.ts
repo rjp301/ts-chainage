@@ -1,5 +1,5 @@
-import GeoPoint from "../geometry/GeoPoint.js";
-import GeoPolyline from "../geometry/GeoPolyline.js";
+import Point from "../geometry/Point.js";
+import Polyline from "../geometry/Polyline.js";
 import Centerline from "./Centerline.js";
 import Marker from "./Marker.js";
 
@@ -19,7 +19,7 @@ describe("Centerline", () => {
       new Marker(9, 9, 90),
       new Marker(10, 10, 100),
     ];
-    const line = new GeoPolyline([new GeoPoint(1, 1), new GeoPoint(10, 10)]);
+    const line = new Polyline([new Point(1, 1), new Point(10, 10)]);
     CL = new Centerline(line, markers, "test centerline");
   });
 

@@ -1,6 +1,5 @@
-import GeoLine from "../../geometry/GeoLine.js";
-import GeoPoint from "../../geometry/GeoPoint.js";
-import GeoPolyline from "../../geometry/GeoPolyline.js";
+import {Line,Point,Polyline} from "@/index.js"
+
 
 const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -14,13 +13,13 @@ function getRandomNumber(min: number, max: number): number {
   return randomNumber;
 }
 
-function randomPoint(): GeoPoint {
+function randomPoint(): Point {
   const x = getRandomNumber(buffer, width - buffer);
   const y = getRandomNumber(buffer, height - buffer);
-  return new GeoPoint(x, y);
+  return new Point(x, y);
 }
 
-function randomPointNearPolyline(pl: GeoPolyline): GeoPoint {
+function randomPointNearPolyline(pl: Polyline): Point {
   let pt = randomPoint();
   let i = 0;
   while (!pl.distNode(pt) && i < 30) {
@@ -30,13 +29,13 @@ function randomPointNearPolyline(pl: GeoPolyline): GeoPoint {
   return pt;
 }
 
-let currentPoint = new GeoPoint(buffer, buffer);
-const points: GeoPoint[] = [currentPoint];
+let currentPoint = new Point(buffer, buffer);
+const points: Point[] = [currentPoint];
 const roughNumPoints = 10;
 
 let i = 0;
 while (i < 2 * roughNumPoints) {
-  const newPoint = new GeoPoint(
+  const newPoint = new Point(
     currentPoint.x + getRandomNumber(0, width / roughNumPoints),
     currentPoint.y + getRandomNumber(0, height / roughNumPoints)
   );
@@ -48,16 +47,26 @@ while (i < 2 * roughNumPoints) {
   i++;
 }
 
-const pl = new GeoPolyline(points);
+const pl = new Polyline(points);
+console.table(pl.segments.map((seg) => seg.length / pl.length));
 
 pl.draw(ctx);
 pl.points.forEach((pt) => pt.draw(ctx, { radius: 2.5 }));
 
-const p1 = randomPointNearPolyline(pl);
-const p2 = randomPointNearPolyline(pl);
+const pt = randomPointNearPolyline(pl);
+pt.draw(ctx);
 
-p1.draw(ctx, { color: "blue" });
-p2.draw(ctx, { color: "blue" });
+const moved = pl.moveNode(pt);
+if (moved) moved.draw(ctx, { color: "blue" });
 
-const spliced = pl.splice(p1, p2);
-spliced?.draw(ctx, { color: "blue" });
+const touching = pl.nearestSegment(pt);
+touching?.draw(ctx, { color: "blue" });
+
+console.log("projected", pl.project(pt));
+
+const interpolation = 0.25;
+const interpolated = pl.interpolate(interpolation);
+interpolated.draw(ctx, { color: "purple", radius: 5 });
+
+const projected = pl.project(interpolated);
+console.log("interpolation", interpolation, "projected", projected);

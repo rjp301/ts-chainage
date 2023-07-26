@@ -1,10 +1,10 @@
-import GeoPoint from "../geometry/GeoPoint.js";
-import GeoPolyline from "../geometry/GeoPolyline.js";
+import Point from "../geometry/Point.js";
+import Polyline from "../geometry/Polyline.js";
 import { QuadTree, createQuadTree } from "../geometry/QuadTree.js";
 import Marker from "./Marker.js";
 
 export default class Centerline {
-  line: GeoPolyline;
+  line: Polyline;
   markers: Marker[];
   name: string;
 
@@ -14,7 +14,7 @@ export default class Centerline {
   KP_min: number;
   KP_max: number;
 
-  constructor(line: GeoPolyline, markers: Marker[], name = "Unnamed") {
+  constructor(line: Polyline, markers: Marker[], name = "Unnamed") {
     this.line = line;
     this.markers = markers
       .map((obj) => obj.calcProjection(line))
@@ -34,7 +34,7 @@ export default class Centerline {
     this.markers.forEach((i) => i.draw(ctx));
   }
 
-  find_KP(node: GeoPoint): number | undefined {
+  find_KP(node: Point): number | undefined {
     const projection = this.line.project(node);
     if (projection === undefined) return;
 
@@ -85,7 +85,7 @@ export default class Centerline {
     );
   }
 
-  from_KP(KP: number): GeoPoint | undefined {
+  from_KP(KP: number): Point | undefined {
     const sortedMarkers = this.markers
       .slice()
       .sort((a, b) => Math.abs(a.value - KP - (b.value - KP)));
@@ -95,7 +95,7 @@ export default class Centerline {
 
     if (m1.projection === undefined || m2.projection === undefined) return;
 
-    if (m1.value === KP || m2.value === KP) return new GeoPoint(m1.x, m1.y);
+    if (m1.value === KP || m2.value === KP) return new Point(m1.x, m1.y);
 
     const valueDelta = m2.value - m1.value;
     const projectionDelta = m2.projection - m1.projection;
@@ -104,7 +104,7 @@ export default class Centerline {
     return this.line.interpolate(p);
   }
 
-  splice_KP(KP_beg: number, KP_end: number): GeoPolyline | undefined {
+  splice_KP(KP_beg: number, KP_end: number): Polyline | undefined {
     const KP_beg_verified = Math.max(Math.min(KP_beg, KP_end), this.KP_min);
     const KP_end_verified = Math.min(Math.max(KP_beg, KP_end), this.KP_max);
 

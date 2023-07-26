@@ -1,18 +1,18 @@
-import { LineString } from "geojson";
-import GeoPoint from "./GeoPoint.js";
+import { LineString as geoLineString } from "geojson";
+import Point from "./Point.js";
 
 type GeoLineDrawOptions = {
   color?: string;
   width?: number;
 };
 
-export default class GeoLine implements LineString {
+export default class Line implements geoLineString {
   type: "LineString";
 
-  p1: GeoPoint;
-  p2: GeoPoint;
+  p1: Point;
+  p2: Point;
 
-  constructor(p1: GeoPoint, p2: GeoPoint) {
+  constructor(p1: Point, p2: Point) {
     this.type = "LineString";
 
     this.p1 = p1;
@@ -65,7 +65,7 @@ export default class GeoLine implements LineString {
     return { m, b };
   }
 
-  whichSide(node: GeoPoint): number {
+  whichSide(node: Point): number {
     const d =
       (node.x - this.p1.x) * (this.p2.y - this.p1.y) -
       (node.y - this.p1.y) * (this.p2.x - this.p1.x);
@@ -75,7 +75,7 @@ export default class GeoLine implements LineString {
     return 0;
   }
 
-  distNode(node: GeoPoint, signed = false): number {
+  distNode(node: Point, signed = false): number {
     const { A, B, C } = this.equation_abc();
     const num = Math.abs(A * node.x + B * node.y + C);
     const signedNum = signed ? num * this.whichSide(node) : num;
@@ -83,7 +83,7 @@ export default class GeoLine implements LineString {
     return den === 0 ? 0 : signedNum / den;
   }
 
-  touchingNode(node: GeoPoint): boolean {
+  touchingNode(node: Point): boolean {
     const cross_product =
       (node.y - this.p1.y) * (this.p2.x - this.p1.x) -
       (node.x - this.p1.x) * (this.p2.y - this.p1.y);
@@ -102,16 +102,16 @@ export default class GeoLine implements LineString {
     return true;
   }
 
-  moveNode(node: GeoPoint): GeoPoint {
+  moveNode(node: Point): Point {
     if (this.touchingNode(node)) return node;
 
     const { A, B, C } = this.equation_abc();
     const x = (B * (B * node.x - A * node.y) - A * C) / (A * A + B * B);
     const y = (A * (-B * node.x + A * node.y) - B * C) / (A * A + B * B);
-    return new GeoPoint(x, y, node.z);
+    return new Point(x, y, node.z);
   }
 
-  intersectionOther(other: GeoLine, constrained = true): GeoPoint | undefined {
+  intersectionOther(other: Line, constrained = true): Point | undefined {
     const x1 = this.p1.x;
     const x2 = this.p2.x;
     const x3 = other.p1.x;
@@ -134,19 +134,19 @@ export default class GeoLine implements LineString {
     const x = this.p1.x + t * (this.p2.x - this.p1.x);
     const y = this.p1.y + t * (this.p2.y - this.p1.y);
 
-    return new GeoPoint(x, y);
+    return new Point(x, y);
   }
 
-  interpolate(dist: number): GeoPoint {
+  interpolate(dist: number): Point {
     if (dist < 0) return this.p1;
     if (dist > 1) return this.p2;
 
     const x = (1 - dist) * this.p1.x + dist * this.p2.x;
     const y = (1 - dist) * this.p1.y + dist * this.p2.y;
-    return new GeoPoint(x, y);
+    return new Point(x, y);
   }
 
-  project(node: GeoPoint, constrained = true): number {
+  project(node: Point, constrained = true): number {
     const movedNode = this.moveNode(node);
 
     const dot_product =

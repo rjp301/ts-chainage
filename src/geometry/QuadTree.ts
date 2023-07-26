@@ -1,4 +1,4 @@
-import GeoPoint from "./GeoPoint.js";
+import Point from "./Point.js";
 
 export class Rect {
   cx: number;
@@ -35,13 +35,21 @@ export class Rect {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    const scale = ctx.getTransform().a;
+
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = "magenta";
+    ctx.lineCap = "round";
+    ctx.lineWidth = 1 / scale;
+
     ctx.beginPath();
     ctx.rect(this.west_edge, this.south_edge, this.w, this.h);
     ctx.stroke();
     ctx.closePath();
+    ctx.setLineDash([]);
   }
 
-  contains(point: GeoPoint): boolean {
+  contains(point: Point): boolean {
     return (
       point.x >= this.west_edge &&
       point.x < this.east_edge &&
@@ -64,7 +72,7 @@ export class QuadTree {
   boundary: Rect;
   capacity: number;
   depth: number;
-  points: GeoPoint[];
+  points: Point[];
   divided: boolean;
 
   nw?: QuadTree;
@@ -129,7 +137,7 @@ export class QuadTree {
     return result;
   }
 
-  insert(point: GeoPoint): void {
+  insert(point: Point): void {
     if (!this.boundary.contains(point)) return;
 
     if (this.points.length < this.capacity) {
@@ -145,7 +153,7 @@ export class QuadTree {
     this.se?.insert(point);
   }
 
-  query(boundary: Rect, foundPoints: GeoPoint[] = []): GeoPoint[] {
+  query(boundary: Rect, foundPoints: Point[] = []): Point[] {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(...this.points.filter((pt) => boundary.contains(pt)));
@@ -161,10 +169,10 @@ export class QuadTree {
 
   private queryCircle(
     boundary: Rect,
-    center: GeoPoint,
+    center: Point,
     radius: number,
-    foundPoints: GeoPoint[] = []
-  ): GeoPoint[] {
+    foundPoints: Point[] = []
+  ): Point[] {
     if (!this.boundary.intersects(boundary)) return [];
 
     foundPoints.push(
@@ -182,14 +190,14 @@ export class QuadTree {
     return foundPoints;
   }
 
-  queryRadius(center: GeoPoint, radius: number): GeoPoint[] {
+  queryRadius(center: Point, radius: number): Point[] {
     const boundary = new Rect(center.x, center.y, radius * 2, radius * 2);
 
     return this.queryCircle(boundary, center, radius, []);
   }
 }
 
-export function findBoundary(points: GeoPoint[]): Rect {
+export function findBoundary(points: Point[]): Rect {
   const x_coords = points.map((pt) => pt.x);
   const y_coords = points.map((pt) => pt.y);
 
@@ -207,7 +215,7 @@ export function findBoundary(points: GeoPoint[]): Rect {
   return new Rect(cx, cy, w, h);
 }
 
-export function createQuadTree(points: GeoPoint[]): QuadTree {
+export function createQuadTree(points: Point[]): QuadTree {
   const qtree = new QuadTree(findBoundary(points));
   for (let pt of points) qtree.insert(pt);
   return qtree;

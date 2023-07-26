@@ -1,6 +1,4 @@
-import Marker from "../centerline/Marker.js";
-import GeoPoint from "../geometry/GeoPoint.js";
-import GeoPolyline from "../geometry/GeoPolyline.js";
+import { Marker, Point, Polyline } from "@/index.js";
 
 export function calcBuffer(canvas: HTMLCanvasElement): number {
   return Math.hypot(canvas.width, canvas.height) * 0.05;
@@ -12,19 +10,19 @@ export function getRandomNumber(min: number, max: number): number {
   return randomNumber;
 }
 
-export function randomPoint(canvas: HTMLCanvasElement): GeoPoint {
+export function randomPoint(canvas: HTMLCanvasElement): Point {
   const { height, width } = canvas;
   const buffer = calcBuffer(canvas);
 
   const x = getRandomNumber(buffer, width - buffer);
   const y = getRandomNumber(buffer, height - buffer);
-  return new GeoPoint(x, y);
+  return new Point(x, y);
 }
 
 export function randomPointNearPolyline(
-  pl: GeoPolyline,
+  pl: Polyline,
   canvas: HTMLCanvasElement
-): GeoPoint {
+): Point {
   let pt = randomPoint(canvas);
   let i = 0;
   while (!pl.distNode(pt) && i < 30) {
@@ -37,16 +35,16 @@ export function randomPointNearPolyline(
 export function createPolyline(
   canvas: HTMLCanvasElement,
   roughNumPoints = 10
-): GeoPolyline {
+): Polyline {
   const { height, width } = canvas;
   const buffer = calcBuffer(canvas);
 
-  let currentPoint = new GeoPoint(buffer, buffer);
-  const points: GeoPoint[] = [currentPoint];
+  let currentPoint = new Point(buffer, buffer);
+  const points: Point[] = [currentPoint];
 
   let i = 0;
   while (i < 2 * roughNumPoints) {
-    const newPoint = new GeoPoint(
+    const newPoint = new Point(
       currentPoint.x + getRandomNumber(0, width / roughNumPoints),
       currentPoint.y + getRandomNumber(0, height / roughNumPoints)
     );
@@ -58,10 +56,10 @@ export function createPolyline(
     i++;
   }
 
-  return new GeoPolyline(points);
+  return new Polyline(points);
 }
 
-export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
+export function createMarkers(pl: Polyline, numMarkers = 10): Marker[] {
   const spacing = (Math.trunc(pl.length / (numMarkers - 1)) / pl.length) * 1.0;
   const markers: Marker[] = [];
   for (let i = 0; i < numMarkers; i++) {
@@ -69,7 +67,7 @@ export function createMarkers(pl: GeoPolyline, numMarkers = 10): Marker[] {
     const value = pl.length * i * spacing * getRandomNumber(0.99, 1.01);
     markers.push(new Marker(pt.x, pt.y, value));
   }
-  return markers.sort(
-    (a, b) => pl.project(a.toPoint())! - pl.project(b.toPoint())!
-  ).slice(1);
+  return markers
+    .sort((a, b) => pl.project(a.toPoint())! - pl.project(b.toPoint())!)
+    .slice(1);
 }

@@ -1,8 +1,8 @@
-import GeoPoint from "../geometry/GeoPoint.js";
-import GeoPolyline from "../geometry/GeoPolyline.js";
+import Point from "../geometry/Point.js";
+import Polyline from "../geometry/Polyline.js";
 import formatKP from "../utils/formatKP.js";
 
-export default class Marker extends GeoPoint {
+export default class Marker extends Point {
   value: number;
   projection: number | undefined;
 
@@ -11,7 +11,7 @@ export default class Marker extends GeoPoint {
     this.value = value;
   }
 
-  calcProjection(pl: GeoPolyline): Marker {
+  calcProjection(pl: Polyline): Marker {
     this.projection = pl.project(this);
     return this;
   }
@@ -28,7 +28,7 @@ export default class Marker extends GeoPoint {
     ctx.fillText(formatKP(this.value), this.x + 8, this.y + 3);
   }
 
-  toPoint(): GeoPoint {
-    return new GeoPoint(this.x, this.y);
+  toPoint(): Point {
+    return new Point(this.x, this.y);
   }
 }

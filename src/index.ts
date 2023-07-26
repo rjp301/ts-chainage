@@ -1,6 +1,6 @@
-import GeoPoint from "./geometry/GeoPoint.js";
-import GeoLine from "./geometry/GeoLine.js";
-import GeoPolyline from "./geometry/GeoPolyline.js";
+import Point from "./geometry/Point.js";
+import Line from "./geometry/Line.js";
+import Polyline from "./geometry/Polyline.js";
 import {
   createQuadTree,
   QuadTree,
@@ -13,9 +13,9 @@ import Marker from "./centerline/Marker.js";
 import formatKP from "./utils/formatKP.js";
 
 export {
-  GeoPoint,
-  GeoLine,
-  GeoPolyline,
+  Point,
+  Line,
+  Polyline,
   createQuadTree,
   QuadTree,
   findBoundary,

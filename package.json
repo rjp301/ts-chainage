@@ -1,12 +1,13 @@
 {
   "name": "chainage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Geospatial library with a focus on working with the centerlines of linear projects",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "main": "./dist/cjs/src/index.js",
+  "module": "./dist/esm/src/index.js",
   "type": "commonjs",
   "files": [
-    "dist/"
+    "dist/cjs/src",
+    "dist/esm/src"
   ],
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",

@@ -1,8 +1,8 @@
 import {
   Centerline,
   Marker,
-  GeoLine,
-  GeoPoint,
+  Line,
+  Point,
   formatKP,
 } from "@/index.js";
 
@@ -39,11 +39,11 @@ function drawLoop() {
 
   CL.draw(ctx);
 
-  const mousePoint = new GeoPoint(mousePosition.x, mousePosition.y);
+  const mousePoint = new Point(mousePosition.x, mousePosition.y);
   const movedPoint = pl.moveNode(mousePoint);
 
   if (movedPoint !== undefined) {
-    new GeoLine(mousePoint, movedPoint).draw(ctx, { color: "blue" });
+    new Line(mousePoint, movedPoint).draw(ctx, { color: "blue" });
     movedPoint.draw(ctx, { color: "blue" });
   }
 

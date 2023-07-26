@@ -1,10 +1,10 @@
-import GeoPoint from "./GeoPoint.js";
+import Point from "./Point.js";
 
 describe("GeoPoint", () => {
-  let pt: GeoPoint;
+  let pt: Point;
 
   beforeEach(() => {
-    pt = new GeoPoint(1, 2);
+    pt = new Point(1, 2);
   });
 
   test("should have correct coordinates", () => {
@@ -16,7 +16,7 @@ describe("GeoPoint", () => {
   });
 
   test("should calculate distance to another GeoPoint", () => {
-    const otherGeoPoint = new GeoPoint(4, 6);
+    const otherGeoPoint = new Point(4, 6);
     const distance = pt.distOther(otherGeoPoint);
     expect(distance).toBeCloseTo(5, 2);
   });

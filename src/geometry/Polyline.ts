@@ -1,33 +1,33 @@
-import { LineString } from "geojson";
-import GeoPoint from "./GeoPoint.js";
+import { LineString as geoLineString } from "geojson";
+import Point from "./Point.js";
 import { QuadTree, createQuadTree } from "./QuadTree.js";
-import GeoLine from "./GeoLine.js";
+import Line from "./Line.js";
 
-type GeoPolylineDrawOptions = {
+type DrawOptions = {
   color?: string;
   width?: number;
 };
 
-export default class GeoPolyline implements LineString {
+export default class Polyline implements geoLineString {
   type: "LineString";
 
-  points: GeoPoint[];
-  segments: GeoLine[];
+  points: Point[];
+  segments: Line[];
   qTree: QuadTree;
   qRadius: number;
   length: number;
 
-  constructor(points: GeoPoint[]) {
+  constructor(points: Point[]) {
     this.type = "LineString";
     this.points = points;
     this.qTree = createQuadTree(points);
 
     let length = 0;
     let maxSegmentLength = 0;
-    const segments: GeoLine[] = [];
+    const segments: Line[] = [];
 
     for (let i = 1; i < points.length; i++) {
-      const segment = new GeoLine(points[i - 1], points[i]);
+      const segment = new Line(points[i - 1], points[i]);
       length += segment.length;
       maxSegmentLength = Math.max(maxSegmentLength, segment.length);
       segments.push(segment);
@@ -49,7 +49,7 @@ export default class GeoPolyline implements LineString {
       .join(", ")})`;
   }
 
-  draw(ctx: CanvasRenderingContext2D, options: GeoPolylineDrawOptions = {}) {
+  draw(ctx: CanvasRenderingContext2D, options: DrawOptions = {}) {
     const width = options.width || 2;
     const color = options.color || "crimson";
 
@@ -69,12 +69,12 @@ export default class GeoPolyline implements LineString {
     ctx.closePath();
   }
 
-  nearestVertex(node: GeoPoint): GeoPoint | undefined {
+  nearestVertex(node: Point): Point | undefined {
     const points = this.qTree.queryRadius(node, this.qRadius);
     return node.nearest(points);
   }
 
-  moveNode(node: GeoPoint): GeoPoint | undefined {
+  moveNode(node: Point): Point | undefined {
     const nearestVertex = this.nearestVertex(node);
     if (!nearestVertex) return;
 
@@ -95,23 +95,23 @@ export default class GeoPolyline implements LineString {
     return nearestVertex;
   }
 
-  nearestSegment(node: GeoPoint): GeoLine | undefined {
+  nearestSegment(node: Point): Line | undefined {
     const movedNode = this.moveNode(node);
     if (!movedNode) return;
     return this.segments.find((seg) => seg.touchingNode(movedNode));
   }
 
-  touchingNode(node: GeoPoint): boolean {
+  touchingNode(node: Point): boolean {
     const segment = this.nearestSegment(node);
     return segment ? segment.touchingNode(node) : false;
   }
 
-  distNode(node: GeoPoint, signed = false): number | undefined {
+  distNode(node: Point, signed = false): number | undefined {
     const segment = this.nearestSegment(node);
     return segment?.distNode(node, signed);
   }
 
-  interpolate(dist: number): GeoPoint {
+  interpolate(dist: number): Point {
     if (dist > 1) return this.points[this.points.length - 1];
     if (dist < 0) return this.points[0];
 
@@ -130,7 +130,7 @@ export default class GeoPolyline implements LineString {
     return this.points[0];
   }
 
-  project(node: GeoPoint): number | undefined {
+  project(node: Point): number | undefined {
     const movedNode = this.moveNode(node);
     if (!movedNode) return;
 
@@ -146,17 +146,17 @@ export default class GeoPolyline implements LineString {
     return cumulative;
   }
 
-  private reversed(): GeoPolyline {
+  private reversed(): Polyline {
     const points = this.points.reverse();
-    return new GeoPolyline(points);
+    return new Polyline(points);
   }
 
-  splice(p1: GeoPoint, p2: GeoPoint): GeoPolyline | undefined {
+  splice(p1: Point, p2: Point): Polyline | undefined {
     type info = {
-      pt: GeoPoint;
-      segment: GeoLine;
+      pt: Point;
+      segment: Line;
       index: number;
-      moved: GeoPoint;
+      moved: Point;
     };
 
     const p1_segment = this.nearestSegment(p1);
@@ -186,7 +186,7 @@ export default class GeoPolyline implements LineString {
 
     if (p1_info.index > p2_info.index) [p1_info, p2_info] = [p2_info, p1_info];
 
-    const vertices: GeoPoint[] = [];
+    const vertices: Point[] = [];
     let index = p1_info.index;
     vertices.push(p1_info.moved!);
 
@@ -196,6 +196,6 @@ export default class GeoPolyline implements LineString {
     }
 
     vertices.push(p2_info.moved);
-    return new GeoPolyline(vertices);
+    return new Polyline(vertices);
   }
 }

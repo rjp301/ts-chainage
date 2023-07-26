@@ -1,11 +1,11 @@
-import { Point } from "geojson";
+import { Point as geoPoint } from "geojson";
 
-type GeoPointDrawOptions = {
+type DrawOptions = {
   color?: string;
   radius?: number;
 };
 
-export default class GeoPoint implements Point {
+export default class Point implements geoPoint {
   type: "Point";
 
   x: number;
@@ -24,7 +24,7 @@ export default class GeoPoint implements Point {
     return [this.x, this.y, this.z];
   }
 
-  draw(ctx: CanvasRenderingContext2D, options: GeoPointDrawOptions = {}) {
+  draw(ctx: CanvasRenderingContext2D, options: DrawOptions = {}) {
     const radius = options.radius || 3;
     const color = options.color || "crimson";
 
@@ -41,13 +41,13 @@ export default class GeoPoint implements Point {
       .join(" ")})`;
   }
 
-  distOther(other: GeoPoint): number {
+  distOther(other: Point): number {
     const deltaX = this.coordinates[0] - other.coordinates[0];
     const deltaY = this.coordinates[1] - other.coordinates[1];
     return Math.hypot(deltaX, deltaY);
   }
 
-  nearest(others: GeoPoint[]): GeoPoint | undefined {
+  nearest(others: Point[]): Point | undefined {
     return others.sort((a, b) => this.distOther(a) - this.distOther(b))[0];
   }
 }
