@@ -58,7 +58,7 @@ const pt = randomPointNearPolyline(pl);
 pt.draw(ctx);
 
 const moved = pl.moveNode(pt);
-moved.draw(ctx, { color: "blue" });
+if (moved) moved.draw(ctx, { color: "blue" });
 
 const touching = pl.nearestSegment(pt);
 touching?.draw(ctx, { color: "blue" });

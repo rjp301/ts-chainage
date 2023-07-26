@@ -1,4 +1,4 @@
-import { Rect, createQuadTree } from "../../quadtree.js";
+import { Rect, createQuadTree } from "../../geometry/QuadTree.js";
 
 import GeoPoint from "../../geometry/GeoPoint.js";
 import GeoLine from "../../geometry/GeoLine.js";
@@ -38,5 +38,5 @@ const queried = qtree.queryRadius(queryCenter, queryRadius);
 // const queried = qtree.query(boundary)
 console.log("queried", queried);
 
-pts.forEach((pt) => pt.draw(ctx));
+pts.forEach((pt: GeoPoint) => pt.draw(ctx));
 queried.forEach((pt) => pt.draw(ctx, { color: "#598713" }));

@@ -1,4 +1,4 @@
-import GeoPoint from "./geometry/GeoPoint.js";
+import GeoPoint from "./GeoPoint.js";
 
 export class Rect {
   cx: number;

@@ -1,6 +1,6 @@
 import { LineString } from "geojson";
 import GeoPoint from "./GeoPoint.js";
-import { QuadTree, createQuadTree } from "../quadtree.js";
+import { QuadTree, createQuadTree } from "./QuadTree.js";
 import GeoLine from "./GeoLine.js";
 
 type GeoPolylineDrawOptions = {

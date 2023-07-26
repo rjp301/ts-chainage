@@ -1,18 +1,23 @@
 {
-  "name": "ts-chainage",
+  "name": "chainage",
   "version": "1.0.0",
-  "description": "",
+  "description": "Geospatial library with a focus on working with the centerlines of linear projects",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rjp301/ts-chainage.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "GIS",
+    "geospatial",
+    "chainage"
+  ],
+  "author": "Riley Paul",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/rjp301/ts-chainage/issues"

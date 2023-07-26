@@ -1,6 +1,6 @@
 import GeoPoint from "../geometry/GeoPoint.js";
 import GeoPolyline from "../geometry/GeoPolyline.js";
-import { QuadTree, createQuadTree } from "../quadtree.js";
+import { QuadTree, createQuadTree } from "../geometry/QuadTree.js";
 import Marker from "./Marker.js";
 
 export default class Centerline {
