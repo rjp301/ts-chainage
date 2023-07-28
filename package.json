@@ -1,6 +1,6 @@
 {
   "name": "chainage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Geospatial library with a focus on working with the centerlines of linear projects",
   "main": "./dist/cjs/src/index.js",
   "module": "./dist/esm/src/index.js",

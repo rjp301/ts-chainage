@@ -198,4 +198,13 @@ export default class Polyline implements geoLineString {
     vertices.push(p2_info.moved);
     return new Polyline(vertices);
   }
+
+  elevationAtNode(node: Point): number | undefined {
+    const segment = this.nearestSegment(node);
+    if (!segment) return;
+
+    const projection = segment.project(node);
+    const deltaZ = segment.p2.z - segment.p1.z;
+    return projection * deltaZ + segment.p1.z;
+  }
 }

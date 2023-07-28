@@ -1,4 +1,4 @@
-import Point from "../geometry/Point.js";
+import Point from "../geometry/Point.js"
 import Polyline from "../geometry/Polyline.js";
 import Centerline from "./Centerline.js";
 import Marker from "./Marker.js";
