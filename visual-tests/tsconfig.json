@@ -3,8 +3,11 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@": [
+      "@chainage": [
         "../../src/index.js"
+      ],
+      "@/*": [
+        "/*"
       ]
     }
   },
