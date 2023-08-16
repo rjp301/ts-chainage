@@ -12,13 +12,11 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": [
-        "./src/*",
-        "./visualizations/*"
+        "./src/*"
       ]
     }
   },
   "include": [
-    "./src",
-    "visualizations"
+    "./src"
   ]
 }
