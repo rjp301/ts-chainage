@@ -1,39 +1,38 @@
 import { createQuadTree, Point } from "@chainage";
+import { randomPoint } from "utils";
 
 const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-const { width, height } = canvas;
+let mousePosition = { x: 0, y: 0 };
 
-function getRandomNumber(min: number, max: number): number {
-  const randomDecimal = Math.random();
-  const randomNumber = Math.floor(randomDecimal * (max - min + 1)) + min;
-  return randomNumber;
+function handleMouseMove(event: MouseEvent) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  mousePosition = { x: mouseX, y: mouseY };
 }
 
-function randomPoint(): Point {
-  const buffer = Math.hypot(width, height) * 0.05;
-  const x = getRandomNumber(buffer, width - buffer);
-  const y = getRandomNumber(buffer, height - buffer);
-  return new Point(x, y);
-}
+canvas.addEventListener("mousemove", handleMouseMove);
 
-const pts = Array.from({ length: 200 }, randomPoint);
-
+const pts = Array.from({ length: 200 }, () => randomPoint(canvas));
 const qtree = createQuadTree(pts);
-qtree.draw(ctx);
-// console.log(qtree.toString());
 
-const queryCenter = new Point(width / 3, height / 3);
-const queryRadius = 50;
-queryCenter.draw(ctx, { radius: queryRadius, color: "#abd669" });
+function drawLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  qtree.draw(ctx);
 
-const queried = qtree.queryRadius(queryCenter, queryRadius);
-// const boundary = new Rect(200, 200, 200, 200)
-// boundary.draw(ctx)
+  const mousePoint = new Point(mousePosition.x, mousePosition.y);
 
-// const queried = qtree.query(boundary)
-console.log("queried", queried);
+  const queryRadius = 50;
+  mousePoint.draw(ctx, { radius: queryRadius, color: "#abd669" });
 
-pts.forEach((pt: Point) => pt.draw(ctx));
-queried.forEach((pt) => pt.draw(ctx, { color: "#598713" }));
+  const queried = qtree.queryRadius(mousePoint, queryRadius);
+
+  pts.forEach((pt: Point) => pt.draw(ctx));
+  queried.forEach((pt) => pt.draw(ctx, { color: "#598713" }));
+
+  requestAnimationFrame(drawLoop);
+}
+
+drawLoop();
