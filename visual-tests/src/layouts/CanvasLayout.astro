@@ -4,15 +4,5 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout>
   <canvas id="myCanvas"></canvas>
-  <script>
-    const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-  </script>
   <slot />
 </Layout>
