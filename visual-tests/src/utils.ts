@@ -1,4 +1,4 @@
-import { Marker, Point, Polyline } from "@";
+import { Marker, Point, Polyline } from "@chainage";
 
 export function calcBuffer(canvas: HTMLCanvasElement): number {
   return Math.hypot(canvas.width, canvas.height) * 0.05;

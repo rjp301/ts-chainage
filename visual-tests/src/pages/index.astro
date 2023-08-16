@@ -1,10 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
+const pages = await Astro.glob("./vis/*.astro");
+import Path from "path";
 ---
 
 <Layout>
-  <canvas id="theCanvas"></canvas>
-	hello
+  <main class="p-4">
+    <h1 class="text-lg font-bold">Visualizations</h1>
+    <ul>
+      {
+        pages.map((page) => (
+          <li class="hover:underline">
+            <a href={page.url}>{Path.parse(page.file).name}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
 </Layout>
-
-

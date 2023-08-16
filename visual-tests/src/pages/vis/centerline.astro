@@ -6,7 +6,7 @@ import CanvasLayout from "layouts/CanvasLayout.astro";
 <Layout>
   <CanvasLayout>
     <script>
-      import { Centerline, Marker, Line, Point, formatKP } from "@";
+      import { Centerline, Marker, Line, Point, formatKP } from "@chainage";
 
       import {
         calcBuffer,
@@ -14,7 +14,7 @@ import CanvasLayout from "layouts/CanvasLayout.astro";
         createPolyline,
         getRandomNumber,
         randomPointNearPolyline,
-      } from "../utils.js";
+      } from "utils.js";
 
       const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
